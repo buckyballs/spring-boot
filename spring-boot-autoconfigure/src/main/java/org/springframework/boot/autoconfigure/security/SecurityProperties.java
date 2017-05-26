@@ -18,6 +18,7 @@ package org.springframework.boot.autoconfigure.security;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -357,7 +358,7 @@ public class SecurityProperties implements SecurityPrerequisite {
 		/**
 		 * Granted roles for the default user name.
 		 */
-		private List<String> role = new ArrayList<>(Arrays.asList("USER"));
+		private List<String> role = new ArrayList<>(Collections.singletonList("USER"));
 
 		private boolean defaultPassword = true;
 

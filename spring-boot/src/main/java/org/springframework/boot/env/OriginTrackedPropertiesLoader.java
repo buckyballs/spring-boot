@@ -23,7 +23,10 @@ import java.io.LineNumberReader;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.springframework.boot.env.TextResourcePropertyOrigin.Location;
+import org.springframework.boot.origin.Origin;
+import org.springframework.boot.origin.OriginTrackedValue;
+import org.springframework.boot.origin.TextResourceOrigin;
+import org.springframework.boot.origin.TextResourceOrigin.Location;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
@@ -129,7 +132,7 @@ class OriginTrackedPropertiesLoader {
 			buffer.append(reader.getCharacter());
 			reader.read();
 		}
-		PropertyOrigin origin = new TextResourcePropertyOrigin(this.resource, location);
+		Origin origin = new TextResourceOrigin(this.resource, location);
 		return OriginTrackedValue.of(buffer.toString().trim(), origin);
 	}
 
@@ -160,11 +163,19 @@ class OriginTrackedPropertiesLoader {
 		}
 
 		public boolean read() throws IOException {
+			return read(false);
+		}
+
+		public boolean read(boolean wrappedLine) throws IOException {
 			this.escaped = false;
 			this.character = this.reader.read();
 			this.columnNumber++;
-			skipLeadingWhitespace();
-			skipComment();
+			if (this.columnNumber == 0) {
+				skipLeadingWhitespace();
+				if (!wrappedLine) {
+					skipComment();
+				}
+			}
 			if (this.character == '\\') {
 				this.escaped = true;
 				readEscaped();
@@ -176,11 +187,9 @@ class OriginTrackedPropertiesLoader {
 		}
 
 		private void skipLeadingWhitespace() throws IOException {
-			if (this.columnNumber == 0) {
-				while (isWhiteSpace()) {
-					this.character = this.reader.read();
-					this.columnNumber++;
-				}
+			while (isWhiteSpace()) {
+				this.character = this.reader.read();
+				this.columnNumber++;
 			}
 		}
 
@@ -202,7 +211,7 @@ class OriginTrackedPropertiesLoader {
 			}
 			else if (this.character == '\n') {
 				this.columnNumber = -1;
-				read();
+				read(true);
 			}
 			else if (this.character == 'u') {
 				readUnicode();

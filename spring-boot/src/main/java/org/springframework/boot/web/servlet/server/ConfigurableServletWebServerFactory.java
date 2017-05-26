@@ -25,10 +25,11 @@ import java.util.concurrent.TimeUnit;
 
 import org.springframework.boot.web.server.ConfigurableWebServerFactory;
 import org.springframework.boot.web.server.MimeMappings;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 
 /**
- * Simple interface that represents customizations to an {@link ServletWebServerFactory}.
+ * A configurable {@link ServletWebServerFactory}.
  *
  * @author Dave Syer
  * @author Andy Wilkinson
@@ -37,10 +38,10 @@ import org.springframework.boot.web.servlet.ServletContextInitializer;
  * @author Brian Clozel
  * @since 2.0.0
  * @see ServletWebServerFactory
- * @see ServletWebServerFactoryCustomizer
+ * @see WebServerFactoryCustomizer
  */
 public interface ConfigurableServletWebServerFactory
-		extends ConfigurableWebServerFactory {
+		extends ConfigurableWebServerFactory, ServletWebServerFactory {
 
 	/**
 	 * Sets the context path for the web server. The context should start with a "/"

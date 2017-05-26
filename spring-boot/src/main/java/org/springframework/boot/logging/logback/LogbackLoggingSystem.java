@@ -64,6 +64,7 @@ public class LogbackLoggingSystem extends Slf4JLoggingSystem {
 
 	static {
 		LEVELS.map(LogLevel.TRACE, Level.TRACE);
+		LEVELS.map(LogLevel.TRACE, Level.ALL);
 		LEVELS.map(LogLevel.DEBUG, Level.DEBUG);
 		LEVELS.map(LogLevel.INFO, Level.INFO);
 		LEVELS.map(LogLevel.WARN, Level.WARN);
@@ -100,7 +101,6 @@ public class LogbackLoggingSystem extends Slf4JLoggingSystem {
 		}
 		super.beforeInitialize();
 		loggerContext.getTurboFilterList().add(FILTER);
-		configureJBossLoggingToUseSlf4j();
 	}
 
 	@Override
@@ -205,10 +205,6 @@ public class LogbackLoggingSystem extends Slf4JLoggingSystem {
 		getLoggerContext().reset();
 		getLoggerContext().getStatusManager().clear();
 		loadConfiguration(initializationContext, getSelfInitializationConfig(), null);
-	}
-
-	private void configureJBossLoggingToUseSlf4j() {
-		System.setProperty("org.jboss.logging.provider", "slf4j");
 	}
 
 	@Override

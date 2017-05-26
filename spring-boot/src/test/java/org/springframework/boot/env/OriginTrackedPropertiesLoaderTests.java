@@ -22,6 +22,8 @@ import java.util.Properties;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.springframework.boot.origin.OriginTrackedValue;
+import org.springframework.boot.origin.TextResourceOrigin;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 
@@ -52,7 +54,7 @@ public class OriginTrackedPropertiesLoaderTests {
 		Properties ours = new Properties();
 		new OriginTrackedPropertiesLoader(this.resource).load(false)
 				.forEach((k, v) -> ours.put(k, v.getValue()));
-		assertThat(java).isEqualTo(ours);
+		assertThat(ours).isEqualTo(java);
 	}
 
 	@Test
@@ -95,6 +97,27 @@ public class OriginTrackedPropertiesLoaderTests {
 		OriginTrackedValue value = this.properties.get("test-tab-property");
 		assertThat(getValue(value)).isEqualTo("foo\tbar");
 		assertThat(getLocation(value)).isEqualTo("16:19");
+	}
+
+	@Test
+	public void getPropertyWithBang() throws Exception {
+		OriginTrackedValue value = this.properties.get("test-bang-property");
+		assertThat(getValue(value)).isEqualTo("foo!");
+		assertThat(getLocation(value)).isEqualTo("34:20");
+	}
+
+	@Test
+	public void getPropertyWithValueComment() throws Exception {
+		OriginTrackedValue value = this.properties.get("test-property-value-comment");
+		assertThat(getValue(value)).isEqualTo("foo !bar #foo");
+		assertThat(getLocation(value)).isEqualTo("36:29");
+	}
+
+	@Test
+	public void getPropertyWithMultilineImmediateBang() {
+		OriginTrackedValue value = this.properties.get("test-multiline-immediate-bang");
+		assertThat(getValue(value)).isEqualTo("!foo");
+		assertThat(getLocation(value)).isEqualTo("39:1");
 	}
 
 	@Test
@@ -213,7 +236,8 @@ public class OriginTrackedPropertiesLoaderTests {
 		if (value == null) {
 			return null;
 		}
-		return ((TextResourcePropertyOrigin) value.getOrigin()).getLocation().toString();
+		return ((TextResourceOrigin) value.getOrigin()).getLocation()
+				.toString();
 	}
 
 }

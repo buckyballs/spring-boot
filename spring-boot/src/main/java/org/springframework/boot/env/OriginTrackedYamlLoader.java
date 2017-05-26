@@ -37,7 +37,10 @@ import org.yaml.snakeyaml.representer.Representer;
 import org.yaml.snakeyaml.resolver.Resolver;
 
 import org.springframework.beans.factory.config.YamlProcessor;
-import org.springframework.boot.env.TextResourcePropertyOrigin.Location;
+import org.springframework.boot.origin.Origin;
+import org.springframework.boot.origin.OriginTrackedValue;
+import org.springframework.boot.origin.TextResourceOrigin;
+import org.springframework.boot.origin.TextResourceOrigin.Location;
 import org.springframework.boot.yaml.SpringProfileDocumentMatcher;
 import org.springframework.core.io.Resource;
 
@@ -76,19 +79,14 @@ class OriginTrackedYamlLoader extends YamlProcessor {
 
 	public Map<String, Object> load() {
 		final Map<String, Object> result = new LinkedHashMap<String, Object>();
-		process(new MatchCallback() {
-
-			@Override
-			public void process(Properties properties, Map<String, Object> map) {
-				result.putAll(getFlattenedMap(map));
-			}
-
+		process((properties, map) -> {
+			result.putAll(getFlattenedMap(map));
 		});
 		return result;
 	}
 
 	/**
-	 * {@link Constructor}.
+	 * {@link Constructor} that tracks property origins.
 	 */
 	private class OriginTrackingConstructor extends StrictMapAppenderConstructor {
 
@@ -100,23 +98,25 @@ class OriginTrackedYamlLoader extends YamlProcessor {
 				}
 			}
 			else if (node instanceof MappingNode) {
-				List<NodeTuple> value = ((MappingNode) node).getValue();
-				List<NodeTuple> updatedValues = value.stream().map(nt -> new NodeTuple(KeyScalarNode.get(nt.getKeyNode()),
-						nt.getValueNode())).collect(Collectors.toList());
-				((MappingNode) node).setValue(updatedValues);
+				replaceMappingNodeKeys((MappingNode) node);
 			}
 			return super.constructObject(node);
 		}
 
+		private void replaceMappingNodeKeys(MappingNode node) {
+			node.setValue(node.getValue().stream().map(KeyScalarNode::get)
+					.collect(Collectors.toList()));
+		}
+
 		private Object constructTrackedObject(Node node, Object value) {
-			PropertyOrigin origin = getOrigin(node);
+			Origin origin = getOrigin(node);
 			return OriginTrackedValue.of(value, origin);
 		}
 
-		private PropertyOrigin getOrigin(Node node) {
+		private Origin getOrigin(Node node) {
 			Mark mark = node.getStartMark();
 			Location location = new Location(mark.getLine(), mark.getColumn());
-			return new TextResourcePropertyOrigin(OriginTrackedYamlLoader.this.resource,
+			return new TextResourceOrigin(OriginTrackedYamlLoader.this.resource,
 					location);
 		}
 
@@ -128,7 +128,14 @@ class OriginTrackedYamlLoader extends YamlProcessor {
 	private static class KeyScalarNode extends ScalarNode {
 
 		KeyScalarNode(ScalarNode node) {
-			super(node.getTag(), node.getValue(), node.getStartMark(), node.getEndMark(), node.getStyle());
+			super(node.getTag(), node.getValue(), node.getStartMark(), node.getEndMark(),
+					node.getStyle());
+		}
+
+		public static NodeTuple get(NodeTuple nodeTuple) {
+			Node keyNode = nodeTuple.getKeyNode();
+			Node valueNode = nodeTuple.getValueNode();
+			return new NodeTuple(KeyScalarNode.get(keyNode), valueNode);
 		}
 
 		private static Node get(Node node) {
@@ -155,6 +162,10 @@ class OriginTrackedYamlLoader extends YamlProcessor {
 
 	}
 
+	/**
+	 * {@link SpringProfileDocumentMatcher} that deals with {@link OriginTrackedValue
+	 * OriginTrackedValues}.
+	 */
 	private static class OriginTrackedSpringProfileDocumentMatcher
 			extends SpringProfileDocumentMatcher {
 

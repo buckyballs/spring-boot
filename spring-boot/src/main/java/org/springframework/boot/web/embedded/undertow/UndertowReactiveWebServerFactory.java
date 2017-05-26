@@ -16,8 +16,6 @@
 
 package org.springframework.boot.web.embedded.undertow;
 
-import java.util.Map;
-
 import io.undertow.Undertow;
 
 import org.springframework.boot.web.reactive.server.AbstractReactiveWebServerFactory;
@@ -65,14 +63,6 @@ public class UndertowReactiveWebServerFactory extends AbstractReactiveWebServerF
 		return new UndertowWebServer(builder, getPort() >= 0);
 	}
 
-	@Override
-	public WebServer getWebServer(Map<String, HttpHandler> handlerMap) {
-		Undertow.Builder builder = createBuilder(getPort());
-		UndertowHttpHandlerAdapter handler = new UndertowHttpHandlerAdapter(handlerMap);
-		builder.setHandler(handler);
-		return new UndertowWebServer(builder, getPort() >= 0);
-	}
-
 	private Undertow.Builder createBuilder(int port) {
 		Undertow.Builder builder = Undertow.builder();
 		if (this.bufferSize != null) {
@@ -96,6 +86,22 @@ public class UndertowReactiveWebServerFactory extends AbstractReactiveWebServerF
 			return "0.0.0.0";
 		}
 		return getAddress().getHostAddress();
+	}
+
+	public void setBufferSize(Integer bufferSize) {
+		this.bufferSize = bufferSize;
+	}
+
+	public void setIoThreads(Integer ioThreads) {
+		this.ioThreads = ioThreads;
+	}
+
+	public void setWorkerThreads(Integer workerThreads) {
+		this.workerThreads = workerThreads;
+	}
+
+	public void setDirectBuffers(Boolean directBuffers) {
+		this.directBuffers = directBuffers;
 	}
 
 }

@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.springframework.boot.autoconfigure.web.ErrorAttributes;
+import org.springframework.boot.autoconfigure.web.servlet.error.ErrorAttributes;
 import org.springframework.boot.context.TypeExcludeFilter;
 import org.springframework.boot.jackson.JsonComponent;
 import org.springframework.boot.test.autoconfigure.filter.AnnotationCustomizableTypeExcludeFilter;
@@ -29,6 +29,7 @@ import org.springframework.boot.web.servlet.DelegatingFilterProxyRegistrationBea
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -53,6 +54,7 @@ class WebMvcTypeExcludeFilter extends AnnotationCustomizableTypeExcludeFilter {
 		includes.add(FilterRegistrationBean.class);
 		includes.add(DelegatingFilterProxyRegistrationBean.class);
 		includes.add(HandlerMethodArgumentResolver.class);
+		includes.add(HttpMessageConverter.class);
 		includes.add(ErrorAttributes.class);
 		DEFAULT_INCLUDES = Collections.unmodifiableSet(includes);
 	};

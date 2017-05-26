@@ -27,9 +27,9 @@ import org.junit.runner.RunWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.EndpointWebMvcAutoConfiguration;
+import org.springframework.boot.autoconfigure.http.HttpMessageConvertersAutoConfiguration;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.web.HttpMessageConvertersAutoConfiguration;
-import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -73,7 +73,7 @@ public class HeapdumpMvcEndpointSecureOptionsTests {
 
 	@Test
 	public void invokeOptionsShouldReturnSize() throws Exception {
-		this.mvc.perform(options("/heapdump")).andExpect(status().isOk());
+		this.mvc.perform(options("/application/heapdump")).andExpect(status().isOk());
 	}
 
 	@Import({ JacksonAutoConfiguration.class,

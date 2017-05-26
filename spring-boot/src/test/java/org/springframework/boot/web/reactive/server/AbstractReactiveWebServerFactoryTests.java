@@ -74,16 +74,16 @@ public abstract class AbstractReactiveWebServerFactoryTests {
 	public void startStopServer() {
 		this.webServer = getFactory().getWebServer(new EchoHandler());
 		this.webServer.start();
+		assertThat(this.output.toString()).contains("started on port");
 		Mono<String> result = getWebClient().post().uri("/test")
 				.contentType(MediaType.TEXT_PLAIN)
-				.exchange(BodyInserters.fromObject("Hello World"))
-				.then(response -> response.bodyToMono(String.class));
+				.body(BodyInserters.fromObject("Hello World")).exchange()
+				.flatMap(response -> response.bodyToMono(String.class));
 		assertThat(result.block()).isEqualTo("Hello World");
-
 		this.webServer.stop();
 		Mono<ClientResponse> response = getWebClient().post().uri("/test")
 				.contentType(MediaType.TEXT_PLAIN)
-				.exchange(BodyInserters.fromObject("Hello World"));
+				.body(BodyInserters.fromObject("Hello World")).exchange();
 		StepVerifier.create(response).expectError().verify();
 	}
 
@@ -94,12 +94,10 @@ public abstract class AbstractReactiveWebServerFactoryTests {
 		factory.setPort(specificPort);
 		this.webServer = factory.getWebServer(new EchoHandler());
 		this.webServer.start();
-
 		Mono<String> result = WebClient.create("http://localhost:" + specificPort).post()
 				.uri("/test").contentType(MediaType.TEXT_PLAIN)
-				.exchange(BodyInserters.fromObject("Hello World"))
-				.then(response -> response.bodyToMono(String.class));
-
+				.body(BodyInserters.fromObject("Hello World")).exchange()
+				.flatMap(response -> response.bodyToMono(String.class));
 		assertThat(result.block()).isEqualTo("Hello World");
 		assertThat(this.webServer.getPort()).isEqualTo(specificPort);
 	}

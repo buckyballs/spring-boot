@@ -3,6 +3,12 @@
 <import-control pkg="org.springframework.boot">
 	<allow pkg=".*" regex="true" />
 
+	<!-- Logging -->
+	<subpackage name="logging">
+		<disallow pkg="org.springframework.context" />
+		<disallow pkg="org.springframework.boot.context" />
+	</subpackage>
+
 	<!-- Web related concerns -->
 	<subpackage name="web">
 
@@ -39,11 +45,14 @@
 				<allow pkg="org.springframework.boot.web.server" />
 				<allow pkg="org.springframework.boot.web.servlet" />
 			</subpackage>
-		</subpackage>
-		<subpackage name="support">
-			<allow pkg="javax.servlet" />
-			<allow pkg="org.springframework.boot.web.servlet" />
-			<allow pkg="org.springframework.boot.web.server" />
+			<subpackage name="support">
+				<allow pkg="javax.servlet" />
+				<allow pkg="org.springframework.boot.web.servlet" />
+				<allow pkg="org.springframework.boot.web.server" />
+			</subpackage>
+			<subpackage name="view">
+				<allow pkg="org.springframework.web.servlet" />
+			</subpackage>
 		</subpackage>
 
 		<!-- Reactive -->
@@ -56,6 +65,11 @@
 			<subpackage name="server">
 				<allow pkg="org.springframework.boot.web.server" />
 				<disallow pkg="org.springframework.context" />
+			</subpackage>
+			<subpackage name="result">
+				<subpackage name="view">
+					<allow pkg="org.springframework.boot.web.reactive.result.view" />
+				</subpackage>
 			</subpackage>
 		</subpackage>
 

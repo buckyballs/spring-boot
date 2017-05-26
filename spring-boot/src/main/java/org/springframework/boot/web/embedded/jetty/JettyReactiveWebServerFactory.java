@@ -17,8 +17,9 @@
 package org.springframework.boot.web.embedded.jetty;
 
 import java.net.InetSocketAddress;
-import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.eclipse.jetty.server.AbstractConnector;
 import org.eclipse.jetty.server.ConnectionFactory;
 import org.eclipse.jetty.server.HttpConfiguration;
@@ -42,6 +43,9 @@ import org.springframework.http.server.reactive.JettyHttpHandlerAdapter;
  */
 public class JettyReactiveWebServerFactory extends AbstractReactiveWebServerFactory {
 
+	private static final Log logger = LogFactory
+			.getLog(JettyReactiveWebServerFactory.class);
+
 	/**
 	 * The number of acceptor threads to use.
 	 */
@@ -62,8 +66,8 @@ public class JettyReactiveWebServerFactory extends AbstractReactiveWebServerFact
 	}
 
 	/**
-	 * Create a new {@link JettyServletWebServerFactory} that listens for requests
-	 * using the specified port.
+	 * Create a new {@link JettyServletWebServerFactory} that listens for requests using
+	 * the specified port.
 	 * @param port the port to listen on
 	 */
 	public JettyReactiveWebServerFactory(int port) {
@@ -77,13 +81,6 @@ public class JettyReactiveWebServerFactory extends AbstractReactiveWebServerFact
 		return new JettyWebServer(server, getPort() >= 0);
 	}
 
-	@Override
-	public WebServer getWebServer(Map<String, HttpHandler> handlerMap) {
-		JettyHttpHandlerAdapter servlet = new JettyHttpHandlerAdapter(handlerMap);
-		Server server = createJettyServer(servlet);
-		return new JettyWebServer(server, getPort() >= 0);
-	}
-
 	protected Server createJettyServer(JettyHttpHandlerAdapter servlet) {
 		int port = (getPort() >= 0 ? getPort() : 0);
 		InetSocketAddress address = new InetSocketAddress(getAddress(), port);
@@ -93,7 +90,8 @@ public class JettyReactiveWebServerFactory extends AbstractReactiveWebServerFact
 		ServletContextHandler contextHandler = new ServletContextHandler(server, "",
 				false, false);
 		contextHandler.addServlet(servletHolder, "/");
-		this.logger.info("Server initialized with port: " + port);
+		JettyReactiveWebServerFactory.logger
+				.info("Server initialized with port: " + port);
 		return server;
 	}
 

@@ -50,7 +50,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnResource;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
-import org.springframework.boot.autoconfigure.web.HttpMessageConverters;
+import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.boot.autoconfigure.web.ResourceProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -250,7 +250,7 @@ public class EndpointWebMvcHypermediaManagementContextConfiguration {
 			if (messageConverter instanceof TypeConstrainedMappingJackson2HttpMessageConverter) {
 				List<MediaType> supportedMediaTypes = new ArrayList<>(
 						messageConverter.getSupportedMediaTypes());
-				supportedMediaTypes.add(ActuatorMediaTypes.APPLICATION_ACTUATOR_V1_JSON);
+				supportedMediaTypes.add(ActuatorMediaTypes.APPLICATION_ACTUATOR_V2_JSON);
 				((AbstractHttpMessageConverter<?>) messageConverter)
 						.setSupportedMediaTypes(supportedMediaTypes);
 			}

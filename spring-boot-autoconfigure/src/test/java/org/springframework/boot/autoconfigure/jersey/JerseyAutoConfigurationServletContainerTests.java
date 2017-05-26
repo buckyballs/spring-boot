@@ -16,6 +16,8 @@
 
 package org.springframework.boot.autoconfigure.jersey;
 
+import java.nio.charset.Charset;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
@@ -32,7 +34,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration;
 import org.springframework.boot.autoconfigure.jersey.JerseyAutoConfigurationServletContainerTests.Application;
-import org.springframework.boot.autoconfigure.web.ServletWebServerFactoryAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.servlet.ServletWebServerFactoryAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.rule.OutputCapture;
@@ -103,7 +105,7 @@ public class JerseyAutoConfigurationServletContainerTests {
 					jerseyServlet.setServlet(new ServletContainer());
 					jerseyServlet.setOverridable(false);
 					context.addChild(jerseyServlet);
-					String pattern = UDecoder.URLDecode("/*", "UTF-8");
+					String pattern = UDecoder.URLDecode("/*", Charset.forName("UTF-8"));
 					context.addServletMappingDecoded(pattern, servletName);
 				}
 
