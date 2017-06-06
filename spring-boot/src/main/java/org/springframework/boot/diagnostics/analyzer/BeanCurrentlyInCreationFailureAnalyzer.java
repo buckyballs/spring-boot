@@ -25,7 +25,6 @@ import org.springframework.beans.factory.InjectionPoint;
 import org.springframework.beans.factory.UnsatisfiedDependencyException;
 import org.springframework.boot.diagnostics.AbstractFailureAnalyzer;
 import org.springframework.boot.diagnostics.FailureAnalysis;
-import org.springframework.core.annotation.Order;
 import org.springframework.util.StringUtils;
 
 /**
@@ -34,35 +33,46 @@ import org.springframework.util.StringUtils;
  *
  * @author Andy Wilkinson
  */
-@Order(0)
 class BeanCurrentlyInCreationFailureAnalyzer
 		extends AbstractFailureAnalyzer<BeanCurrentlyInCreationException> {
 
 	@Override
 	protected FailureAnalysis analyze(Throwable rootFailure,
 			BeanCurrentlyInCreationException cause) {
-		List<BeanInCycle> cycle = new ArrayList<>();
+		DependencyCycle dependencyCycle = findCycle(rootFailure);
+		if (dependencyCycle == null) {
+			return null;
+		}
+		return new FailureAnalysis(buildMessage(dependencyCycle), null, cause);
+	}
+
+	private DependencyCycle findCycle(Throwable rootFailure) {
+		List<BeanInCycle> beansInCycle = new ArrayList<>();
 		Throwable candidate = rootFailure;
 		int cycleStart = -1;
 		while (candidate != null) {
 			BeanInCycle beanInCycle = BeanInCycle.get(candidate);
 			if (beanInCycle != null) {
-				int index = cycle.indexOf(beanInCycle);
+				int index = beansInCycle.indexOf(beanInCycle);
 				if (index == -1) {
-					cycle.add(beanInCycle);
+					beansInCycle.add(beanInCycle);
 				}
 				cycleStart = (cycleStart == -1 ? index : cycleStart);
 			}
 			candidate = candidate.getCause();
 		}
-		String message = buildMessage(cycle, cycleStart);
-		return new FailureAnalysis(message, null, cause);
+		if (cycleStart == -1) {
+			return null;
+		}
+		return new DependencyCycle(beansInCycle, cycleStart);
 	}
 
-	private String buildMessage(List<BeanInCycle> beansInCycle, int cycleStart) {
+	private String buildMessage(DependencyCycle dependencyCycle) {
 		StringBuilder message = new StringBuilder();
 		message.append(String.format("The dependencies of some of the beans in the "
 				+ "application context form a cycle:%n%n"));
+		List<BeanInCycle> beansInCycle = dependencyCycle.getBeansInCycle();
+		int cycleStart = dependencyCycle.getCycleStart();
 		for (int i = 0; i < beansInCycle.size(); i++) {
 			BeanInCycle beanInCycle = beansInCycle.get(i);
 			if (i == cycleStart) {
@@ -77,6 +87,27 @@ class BeanCurrentlyInCreationFailureAnalyzer
 		}
 		message.append(String.format("└─────┘%n"));
 		return message.toString();
+	}
+
+	private static final class DependencyCycle {
+
+		private final List<BeanInCycle> beansInCycle;
+
+		private final int cycleStart;
+
+		private DependencyCycle(List<BeanInCycle> beansInCycle, int cycleStart) {
+			this.beansInCycle = beansInCycle;
+			this.cycleStart = cycleStart;
+		}
+
+		public List<BeanInCycle> getBeansInCycle() {
+			return this.beansInCycle;
+		}
+
+		public int getCycleStart() {
+			return this.cycleStart;
+		}
+
 	}
 
 	private static final class BeanInCycle {

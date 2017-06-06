@@ -42,7 +42,7 @@ The curated list contains all the spring modules that you can use with Spring Bo
 well as a refined list of third party libraries. The list is available as a standard
 <<using-boot-maven-without-a-parent,Bills of Materials (`spring-boot-dependencies`)>>
 that can be used with both <<using-boot-maven-parent-pom,Maven>> and
-{spring-boot-gradle-plugin}[Gradle].
+<<using-boot-gradle,Gradle>>.
 
 WARNING: Each release of Spring Boot is associated with a base version of the Spring
 Framework so we **highly** recommend you to not specify its version on your own.
@@ -194,10 +194,12 @@ the parent.
 
 [[using-boot-gradle]]
 === Gradle
-To learn about using Spring Boot with Gradle, please refer to the
-{spring-boot-gradle-plugin}[documentation for Spring Boot's Gradle plugin].
+To learn about using Spring Boot with Gradle, please refer to the documentation for
+Spring Boot's Gradle plugin:
 
-
+* Reference ({spring-boot-gradle-plugin}/reference/html[HTML] and
+  {spring-boot-gradle-plugin}/reference/pdf/spring-boot-gradle-plugin-reference.pdf[PDF])
+* {spring-boot-gradle-plugin}/api[API]
 
 [[using-boot-ant]]
 ===  Ant
@@ -774,6 +776,10 @@ restart. It will not work correctly if you have disabled the shutdown hook (
 NOTE: When deciding if an entry on the classpath should trigger a restart when it changes,
 DevTools automatically ignores projects named `spring-boot`, `spring-boot-devtools`,
 `spring-boot-autoconfigure`, `spring-boot-actuator`, and `spring-boot-starter`.
+
+NOTE: DevTools needs to customize the `ResourceLoader` used by the `ApplicationContext`:
+if your application provides one already, it is going to be wrapped. Direct override of
+the `getResource` method on the `ApplicationContext` is not supported.
 
 [[using-spring-boot-restart-vs-reload]]
 .Restart vs Reload

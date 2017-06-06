@@ -48,44 +48,47 @@ public class ElasticsearchDataAutoConfigurationTests {
 	@Test
 	public void templateExists() {
 		this.context = new AnnotationConfigApplicationContext();
-		TestPropertyValues.of(
-				"spring.data.elasticsearch.properties.path.data:target/data",
-				"spring.data.elasticsearch.properties.path.logs:target/logs").applyTo(this.context);
+		TestPropertyValues
+				.of("spring.data.elasticsearch.properties.path.data:target/data",
+						"spring.data.elasticsearch.properties.path.logs:target/logs")
+				.applyTo(this.context);
 		this.context.register(PropertyPlaceholderAutoConfiguration.class,
 				ElasticsearchAutoConfiguration.class,
 				ElasticsearchDataAutoConfiguration.class);
 		this.context.refresh();
-		assertThat(this.context.getBeanNamesForType(ElasticsearchTemplate.class))
-				.hasSize(1);
+		asssertHasSingleBean(ElasticsearchTemplate.class);
 	}
 
 	@Test
 	public void mappingContextExists() {
 		this.context = new AnnotationConfigApplicationContext();
-		TestPropertyValues.of(
-				"spring.data.elasticsearch.properties.path.data:target/data",
-				"spring.data.elasticsearch.properties.path.logs:target/logs");
+		TestPropertyValues
+				.of("spring.data.elasticsearch.properties.path.data:target/data",
+						"spring.data.elasticsearch.properties.path.logs:target/logs")
+				.applyTo(this.context);
 		this.context.register(PropertyPlaceholderAutoConfiguration.class,
 				ElasticsearchAutoConfiguration.class,
 				ElasticsearchDataAutoConfiguration.class);
 		this.context.refresh();
-		assertThat(
-				this.context.getBeanNamesForType(SimpleElasticsearchMappingContext.class))
-						.hasSize(1);
+		asssertHasSingleBean(SimpleElasticsearchMappingContext.class);
 	}
 
 	@Test
 	public void converterExists() {
 		this.context = new AnnotationConfigApplicationContext();
-		TestPropertyValues.of(
-				"spring.data.elasticsearch.properties.path.data:target/data",
-				"spring.data.elasticsearch.properties.path.logs:target/logs");
+		TestPropertyValues
+				.of("spring.data.elasticsearch.properties.path.data:target/data",
+						"spring.data.elasticsearch.properties.path.logs:target/logs")
+				.applyTo(this.context);
 		this.context.register(PropertyPlaceholderAutoConfiguration.class,
 				ElasticsearchAutoConfiguration.class,
 				ElasticsearchDataAutoConfiguration.class);
 		this.context.refresh();
-		assertThat(this.context.getBeanNamesForType(ElasticsearchConverter.class))
-				.hasSize(1);
+		asssertHasSingleBean(ElasticsearchConverter.class);
+	}
+
+	private void asssertHasSingleBean(Class<?> type) {
+		assertThat(this.context.getBeanNamesForType(type)).hasSize(1);
 	}
 
 }

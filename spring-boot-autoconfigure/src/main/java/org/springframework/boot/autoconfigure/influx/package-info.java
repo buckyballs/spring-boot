@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 the original author or authors.
+ * Copyright 2012-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,30 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.boot.jta.atomikos;
-
 /**
- * Logging levels supported by Atomikos.
- *
- * @author Phillip Webb
- * @since 1.2.0
- * @see AtomikosProperties
+ * Auto-configuration for InfluxDB.
  */
-public enum AtomikosLoggingLevel {
-
-	/**
-	 * Debug Level.
-	 */
-	DEBUG,
-
-	/**
-	 * Info Level.
-	 */
-	INFO,
-
-	/**
-	 * Warning Level.
-	 */
-	WARN
-
-}
+package org.springframework.boot.autoconfigure.influx;
